@@ -25,8 +25,11 @@ export class TrackService {
     });
     return track;
   }
-  async getAll(): Promise<Track[]> {
-    const tracks = await this.trackModel.find();
+  async getAll(count: number = 10, offset: number = 0): Promise<Track[]> {
+    const tracks = await this.trackModel
+      .find()
+      .skip(Number(offset))
+      .limit(Number(count));
     return tracks;
   }
   async getOne(id: ObjectId): Promise<Track> {
@@ -53,5 +56,11 @@ export class TrackService {
     track.listens += 1;
 
     track.save();
+  }
+  async search(query: string): Promise<Track[]> {
+    const tracks = await this.trackModel.find({
+      name: { $regex: new RegExp(query, 'i') },
+    });
+    return tracks;
   }
 }
